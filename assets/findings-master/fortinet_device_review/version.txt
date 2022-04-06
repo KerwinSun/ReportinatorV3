@@ -1,0 +1,7 @@
+Pay attention to the upgrade paths.
+http://cookbook.fortinet.com/sysadmins-notebook/supported-upgrade-paths-fortios/#Build_Numbers
+
+the command to see the version is:
+get system status
+
+one way to figure this out might be to google the build number

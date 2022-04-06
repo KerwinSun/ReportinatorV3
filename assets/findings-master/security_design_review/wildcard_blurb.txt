@@ -1,0 +1,2 @@
+The use of wildcards indicates that the certificates will be stored on multiple systems, thereby increasing the attack surface of the implementation. Compromise of any one of these systems could lead to the compromise of the wildcard certificates. This would allow an attacker to stand a new service up, which uses the stolen certificate. Such a service would appear to be legitimate to any connecting client. Wildcard use is discouraged by RFC 6125, section 7.2.
+  * http://www.rfc-editor.org/rfc/rfc6125.txt
