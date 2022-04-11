@@ -137,8 +137,8 @@ async function insertIssue() {
     let issueId = this.id;
     let issueJSON = documentSearch.get(this.id);
     const docBody = context.document.body;
-    docBody.insertParagraph(
-      JSON.stringify(issueJSON),
+    docBody.insertText(
+      issueJSON.contents,
       Word.InsertLocation.end
     );
     await context.sync();
