@@ -4,7 +4,6 @@
  */
 
 /* global document, Office, Word */
-
 Office.onReady((info) => {
   if (info.host === Office.HostType.Word) {
     document.getElementById("sideload-msg").style.display = "none";
@@ -26,30 +25,49 @@ const searchOptions = {
   },
 };
 
+const Findings = require("../helpers/findingsHandler").default;
+const findings = new Findings();
+findings.getAllFileData().then((findings) => {
+  findings.forEach((finding) => {
+    finding["id"] = id++;
+    if (categories[finding.category] === undefined) {
+      categories[finding.category] = 1;
+    } else {
+      categories[finding.category] += 1;
+    }
+
+    documentSearch.add(finding);
+  });
+  loadCategories();
+});
 const { Document } = require("flexsearch");
 const documentSearch = new Document(searchOptions);
 
 let id = 0;
 let categories = {};
 
-// load the findings
-fetch("../../assets/findings.json")
-  .then((response) => {
-    return response.json();
-  })
-  .then((findings) => {
-    findings.forEach((finding) => {
-      finding["id"] = id++;
-      if (categories[finding.category] === undefined) {
-        categories[finding.category] = 1;
-      } else {
-        categories[finding.category] += 1;
-      }
+fetch("../../assets").then((response) => {
+  console.log(response);
+})
 
-      documentSearch.add(finding);
-    });
-    loadCategories();
-  });
+// load the findings
+// fetch("../../assets/findings.json")
+//   .then((response) => {
+//     return response.json();
+//   })
+//   .then((findings) => {
+//     findings.forEach((finding) => {
+//       finding["id"] = id++;
+//       if (categories[finding.category] === undefined) {
+//         categories[finding.category] = 1;
+//       } else {
+//         categories[finding.category] += 1;
+//       }
+
+//       documentSearch.add(finding);
+//     });
+//     loadCategories();
+//   });
 
 function loadCategories() {
   for (const [key, value] of Object.entries(categories)) {

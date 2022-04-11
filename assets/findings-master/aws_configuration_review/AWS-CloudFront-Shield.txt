@@ -1,4 +1,0 @@
-ACR-4 Insufficient DDoS Defence
-Description
-A distributed denial of service attack attempts to make service or network unavailable by overwhelming the target systems with superfluous requests from many sources under the control of an attacker. Services within AWS can be leveraged to help prevent distributed denial of service attacks.
-One service which can be used to help prevent the negative effects of DDoS attacks is AWS CloudFront. CloudFront is a content delivery network. It caches static content from client servers and serves it, freeing the client servers to handle the dynamic content, reducing load. However, it also acts as a proxy and takes advantage of the defences which AWS has built into it.
