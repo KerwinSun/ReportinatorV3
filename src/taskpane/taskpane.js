@@ -13,6 +13,9 @@ Office.onReady((info) => {
   }
 });
 
+const Findings = require("../helpers/findingsHandler").default;
+
+
 const searchOptions = {
   charset: "latin:extra",
   preset: "match",
@@ -25,7 +28,19 @@ const searchOptions = {
   },
 };
 
-const Findings = require("../helpers/findingsHandler").default;
+const { Document } = require("flexsearch");
+const documentSearch = new Document(searchOptions);
+
+const Writer = require("../helpers/docWriter").default;
+const writer = new Writer()
+
+let id = 0;
+let categories = {};
+
+fetch("../../assets").then((response) => {
+  console.log(response);
+});
+
 const findings = new Findings();
 findings.getAllFileData().then((findings) => {
   findings.forEach((finding) => {
@@ -40,15 +55,6 @@ findings.getAllFileData().then((findings) => {
   });
   loadCategories();
 });
-const { Document } = require("flexsearch");
-const documentSearch = new Document(searchOptions);
-
-let id = 0;
-let categories = {};
-
-fetch("../../assets").then((response) => {
-  console.log(response);
-})
 
 // load the findings
 // fetch("../../assets/findings.json")
@@ -92,7 +98,7 @@ export async function run() {
 
     const ids = documentSearch.search("Windows", 5);
 
-    console.log(ids);
+
     // based on the ids returned by the index, look for the recipes for those ids
     /*const result = recipes.filter((recipe) => ids.includes(recipe.id));
     console.log(result);*/
@@ -136,11 +142,13 @@ async function insertIssue() {
     //code to write issues here
     let issueId = this.id;
     let issueJSON = documentSearch.get(this.id);
+
+    //use helper module to write issue
+
+    writer.writeIssue(context, issueJSON)
+
     const docBody = context.document.body;
-    docBody.insertText(
-      issueJSON.contents,
-      Word.InsertLocation.end
-    );
+    docBody.insertText(issueJSON.contents, Word.InsertLocation.end);
     await context.sync();
   }).catch(function (error) {
     console.log("Error: " + error);
