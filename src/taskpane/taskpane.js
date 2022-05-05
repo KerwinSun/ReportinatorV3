@@ -145,11 +145,8 @@ async function insertIssue() {
 
     //use helper module to write issue
 
-    writer.writeIssue(context, issueJSON)
+    writer.writeIssue(context, Word, issueJSON)
 
-    const docBody = context.document.body;
-    docBody.insertText(issueJSON.contents, Word.InsertLocation.end);
-    await context.sync();
   }).catch(function (error) {
     console.log("Error: " + error);
     if (error instanceof OfficeExtension.Error) {

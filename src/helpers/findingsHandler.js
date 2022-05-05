@@ -17,21 +17,29 @@ class Findings {
     return response;
   }
 
+  // async getAllRepositoryFiles() {
+  //   let currentPage = 1;
+  //   let repoData = await (await this.makeApiRequest("projects/7/repository/tree?recursive=true&per_page=500")).json();
+  //   while (true) {
+  //     currentPage++;
+  //     let pageData = await (
+  //       await this.makeApiRequest(`projects/7/repository/tree?recursive=true&per_page=500&page=${currentPage}`)
+  //     ).json();
+  //     if (pageData.length == 0) {
+  //       break;
+  //     }
+  //     repoData = repoData.concat(pageData);
+  //   }
+  //   return repoData;
+  // }
+
+  //stub for testing
   async getAllRepositoryFiles() {
     let currentPage = 1;
-    let repoData = await (await this.makeApiRequest("projects/7/repository/tree?recursive=true&per_page=500")).json();
-    while (true) {
-      currentPage++;
-      let pageData = await (
-        await this.makeApiRequest(`projects/7/repository/tree?recursive=true&per_page=500&page=${currentPage}`)
-      ).json();
-      if (pageData.length == 0) {
-        break;
-      }
-      repoData = repoData.concat(pageData);
-    }
+    let repoData = await (await this.makeApiRequest("projects/7/repository/tree?recursive=true&per_page=100")).json();
     return repoData;
   }
+
 
   async getFile(path) {
     return await (
