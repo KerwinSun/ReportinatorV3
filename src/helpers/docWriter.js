@@ -3,12 +3,13 @@ class Writer {
     const issueArray = issueJSON?.contents.includes("\r\n")
       ? issueJSON?.contents.split("\r\n").filter((item) => item !== "")
       : issueJSON?.contents.split("\n").filter((item) => item !== "");
-    console.log(issueArray)
+    console.log(issueArray);
     const IssuesMap = this.transformIssuesArray(issueArray);
-    const docBody = context.document.body;
+    const document = context.document;
+    const selection = context.document.getSelection();
 
     for (let issue of IssuesMap) {
-      const paragraph = docBody.insertParagraph(issue.text, Word.InsertLocation.end);
+      const paragraph = selection.insertParagraph(issue.text, Word.InsertLocation.after);
       paragraph[issue.style.type] = issue.style.name;
     }
     await context.sync();

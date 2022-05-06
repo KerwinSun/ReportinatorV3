@@ -17,29 +17,28 @@ class Findings {
     return response;
   }
 
-  // async getAllRepositoryFiles() {
-  //   let currentPage = 1;
-  //   let repoData = await (await this.makeApiRequest("projects/7/repository/tree?recursive=true&per_page=500")).json();
-  //   while (true) {
-  //     currentPage++;
-  //     let pageData = await (
-  //       await this.makeApiRequest(`projects/7/repository/tree?recursive=true&per_page=500&page=${currentPage}`)
-  //     ).json();
-  //     if (pageData.length == 0) {
-  //       break;
-  //     }
-  //     repoData = repoData.concat(pageData);
-  //   }
-  //   return repoData;
-  // }
-
-  //stub for testing
+  //function to get every issue
   async getAllRepositoryFiles() {
     let currentPage = 1;
-    let repoData = await (await this.makeApiRequest("projects/7/repository/tree?recursive=true&per_page=30")).json();
+    let repoData = await (await this.makeApiRequest("projects/7/repository/tree?recursive=true&per_page=500")).json();
+    while (true) {
+      currentPage++;
+      let pageData = await (
+        await this.makeApiRequest(`projects/7/repository/tree?recursive=true&per_page=500&page=${currentPage}`)
+      ).json();
+      if (pageData.length == 0) {
+        break;
+      }
+      repoData = repoData.concat(pageData);
+    }
     return repoData;
   }
 
+  //stub for testing
+  // async getAllRepositoryFiles() {
+  //   let repoData = await (await this.makeApiRequest("projects/7/repository/tree?recursive=true&per_page=30")).json();
+  //   return repoData;
+  // }
 
   async getFile(path) {
     return await (
@@ -48,6 +47,11 @@ class Findings {
   }
 
   async getAllFileData() {
+    if (localStorage.getItem("fileData")) {
+      console.log("loading from local");
+      return JSON.parse(localStorage.getItem("fileData"));
+    }
+
     const fileArray = await this.getAllRepositoryFiles();
     let issueCount = 0;
     for (const fileObject of fileArray) {
@@ -62,7 +66,8 @@ class Findings {
           contents: atob(fileDataObject.content),
         });
     }
-    console.log(`${issueCount} issues loaded`);
+
+    localStorage.setItem("fileData", JSON.stringify(this.fileData));
     return this.fileData;
   }
 }
