@@ -36,7 +36,7 @@ class Findings {
   //stub for testing
   async getAllRepositoryFiles() {
     let currentPage = 1;
-    let repoData = await (await this.makeApiRequest("projects/7/repository/tree?recursive=true&per_page=100")).json();
+    let repoData = await (await this.makeApiRequest("projects/7/repository/tree?recursive=true&per_page=30")).json();
     return repoData;
   }
 

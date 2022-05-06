@@ -15,7 +15,6 @@ Office.onReady((info) => {
 
 const Findings = require("../helpers/findingsHandler").default;
 
-
 const searchOptions = {
   charset: "latin:extra",
   preset: "match",
@@ -32,7 +31,7 @@ const { Document } = require("flexsearch");
 const documentSearch = new Document(searchOptions);
 
 const Writer = require("../helpers/docWriter").default;
-const writer = new Writer()
+const writer = new Writer();
 
 let id = 0;
 let categories = {};
@@ -77,9 +76,54 @@ findings.getAllFileData().then((findings) => {
 
 function loadCategories() {
   for (const [key, value] of Object.entries(categories)) {
-    addListItem(key, value + " findings");
+    addCategoryItem(key, key.replaceAll("_", " "), value + " findings");
   }
   document.getElementsByClassName();
+}
+
+function addCategoryItem(id, name, tagline) {
+  if (name.length > 25) {
+    name = name.substring(0, 22) + "...";
+  }
+
+  document.getElementById("resultlist").innerHTML += `\
+      <li class="ms-ListItem" tabindex="0">\
+        <span class="ms-ListItem-primaryText"><span class="wrap"> 
+        ${name}
+    </span></span>\
+        <span class="ms-ListItem-secondaryText"> ${tagline}
+    </span>\
+        <div class="ms-ListItem-selectionTarget"></div>\
+        <div class="ms-ListItem-actions">\
+          <div id="${id}" class="ms-ListItem-action">\
+            <i class="ms-Icon ms-Icon--CaretSolidRight"></i>\
+          </div>\
+        </div>\
+      </li>`;
+
+  document.getElementsByClassName("ms-ListItem-action").forEach((button) => {
+    //event to handle the arrow thing
+    button.onclick = createDropDown;
+  });
+}
+
+async function createDropDown() {
+  await Word.run(async (context) => {
+    const categoryList = Object.entries(documentSearch?.store).filter((entry) => entry[1].category === this.id);
+    document.getElementById("resultlist").innerHTML = "";
+    for (let item of categoryList) {
+      addListItem(item[1].id, item[1].title, item[1].title);
+    }
+    document.getElementsByClassName("ms-ListItem-action").forEach((button) => {
+      //event to handle the arrow thing
+      button.onclick = insertIssue;
+    });
+  }).catch(function (error) {
+    console.log("Error: " + error);
+    if (error instanceof OfficeExtension.Error) {
+      console.log("Debug info: " + JSON.stringify(error.debugInfo));
+    }
+  });
 }
 
 export async function run() {
@@ -97,7 +141,6 @@ export async function run() {
     paragraph.font.color = "blue";
 
     const ids = documentSearch.search("Windows", 5);
-
 
     // based on the ids returned by the index, look for the recipes for those ids
     /*const result = recipes.filter((recipe) => ids.includes(recipe.id));
@@ -140,13 +183,12 @@ function addListItem(id, name, tagline) {
 async function insertIssue() {
   await Word.run(async (context) => {
     //code to write issues here
-    let issueId = this.id;
+    console.log(documentSearch)
     let issueJSON = documentSearch.get(this.id);
 
     //use helper module to write issue
 
-    writer.writeIssue(context, Word, issueJSON)
-
+    writer.writeIssue(context, Word, issueJSON);
   }).catch(function (error) {
     console.log("Error: " + error);
     if (error instanceof OfficeExtension.Error) {
