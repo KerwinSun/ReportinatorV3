@@ -75,10 +75,10 @@ findings.getAllFileData().then((findings) => {
 //   });
 
 function loadCategories() {
+  document.getElementById("resultlist").innerHTML = "";
   for (const [key, value] of Object.entries(categories)) {
     addCategoryItem(key, key.replaceAll("_", " "), value + " findings");
   }
-  document.getElementsByClassName();
 }
 
 function addCategoryItem(id, name, tagline) {
@@ -110,7 +110,8 @@ function addCategoryItem(id, name, tagline) {
 async function createDropDown() {
   await Word.run(async (context) => {
     const categoryList = Object.entries(documentSearch?.store).filter((entry) => entry[1].category === this.id);
-    document.getElementById("resultlist").innerHTML = "";
+    document.getElementById("resultlist").innerHTML = `<div id="back" class="ms-ListItem-secondaryText"> <span style="float: right;"><i class="ms-Icon ms-Icon--CaretSolidRight" style="transform: rotate(180deg);" transform:=""></i> back </span></div>`;
+
     for (let item of categoryList) {
       addListItem(item[1].id, item[1].title, item[1].title);
     }
@@ -118,6 +119,9 @@ async function createDropDown() {
       //event to handle the arrow thing
       button.onclick = insertIssue;
     });
+
+    document.getElementById("back").onclick = loadCategories;
+
   }).catch(function (error) {
     console.log("Error: " + error);
     if (error instanceof OfficeExtension.Error) {
@@ -183,7 +187,7 @@ function addListItem(id, name, tagline) {
 async function insertIssue() {
   await Word.run(async (context) => {
     //code to write issues here
-    console.log(documentSearch)
+    console.log(documentSearch);
     let issueJSON = documentSearch.get(this.id);
 
     //use helper module to write issue
@@ -199,7 +203,6 @@ async function insertIssue() {
 
 export async function search() {
   return Word.run(async (context) => {
-    document.getElementById("resultlist").innerHTML = "";
     let searchVal = document.getElementById("search").value;
     if (searchVal == "") {
       loadCategories();
