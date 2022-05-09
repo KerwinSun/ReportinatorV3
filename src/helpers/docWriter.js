@@ -25,17 +25,29 @@ class Writer {
 
   transformIssuesArray(issueArray) {
     const issuesMap = [];
+    let coding = false;
     issueArray.map((element, index) => {
       element = element.trimStart().replace("â\x80\x93", "-");
-      if (element.substring(0, 3) === "===") {
-        issuesMap[issuesMap.length - 1].style = { type: "styleBuiltIn", name: "Heading3" };
-      } else if (element.substring(0, 3) === "---") {
-        issuesMap[issuesMap.length - 1].style = { type: "styleBuiltIn", name: "Heading2" };
-      } else if (element.substring(0, 1) === "*") {
-        element = element.substring(1);
-        issuesMap.push({ text: element, style: { type: "style", name: "Bullet" } });
+      if ((coding)) {
+
+        if(element.substring(0, 3) === "```"){
+          coding = false;
+        }else{
+          issuesMap.push({ text: element, style: { type: "style", name: "Code" } });
+        }
       } else {
-        issuesMap.push({ text: element, style: { type: "style", name: "Body Text for Report" } });
+        if (element.substring(0, 3) === "===") {
+          issuesMap[issuesMap.length - 1].style = { type: "styleBuiltIn", name: "Heading3" };
+        } else if (element.substring(0, 3) === "---") {
+          issuesMap[issuesMap.length - 1].style = { type: "styleBuiltIn", name: "Heading2" };
+        } else if (element.substring(0, 3) === "```") {
+          coding = true;
+        } else if (element.substring(0, 1) === "*" && element.substring(1, 3) != "**") {
+          element = element.substring(1);
+          issuesMap.push({ text: element, style: { type: "style", name: "Bullet" } });
+        } else {
+          issuesMap.push({ text: element, style: { type: "style", name: "Body Text for Report" } });
+        }
       }
     });
     return issuesMap;
