@@ -47,28 +47,34 @@ class Findings {
   }
 
   async getAllFileData() {
+    let data = []
     if (localStorage.getItem("fileData")) {
       console.log("loading from local");
-      return JSON.parse(localStorage.getItem("fileData"));
-    }
+      data.push(...JSON.parse(localStorage.getItem("fileData")));
+    } else {
+      const fileArray = await this.getAllRepositoryFiles();
+      let issueCount = 0;
+      for (const fileObject of fileArray) {
+        let fileDataObject = fileObject.type == "blob" && (await this.getFile(fileObject.path));
+        issueCount++;
+        console.log(issueCount);
+        let fileContentsDecoded = fileDataObject.content && atob(fileDataObject.content);
+        fileDataObject &&
+          this.fileData.push({
+            title: fileContentsDecoded.split("\r")?.[0].split("\n")?.[0],
+            category: fileObject.path.split("/")?.[0],
+            contents: atob(fileDataObject.content),
+          });
+      }
 
-    const fileArray = await this.getAllRepositoryFiles();
-    let issueCount = 0;
-    for (const fileObject of fileArray) {
-      let fileDataObject = fileObject.type == "blob" && (await this.getFile(fileObject.path));
-      issueCount++;
-      console.log(issueCount);
-      let fileContentsDecoded = fileDataObject.content && atob(fileDataObject.content);
-      fileDataObject &&
-        this.fileData.push({
-          title: fileContentsDecoded.split("\r")?.[0].split("\n")?.[0],
-          category: fileObject.path.split("/")?.[0],
-          contents: atob(fileDataObject.content),
-        });
+      localStorage.setItem("fileData", JSON.stringify(this.fileData));
+      data.push(...this.fileData);
     }
-
-    localStorage.setItem("fileData", JSON.stringify(this.fileData));
-    return this.fileData;
+    if (localStorage.getItem("customFileData")) {
+      console.log(JSON.parse(localStorage.getItem("customFileData")));
+      data.push(...JSON.parse(localStorage.getItem("customFileData")));
+    } 
+    return data;
   }
 }
 

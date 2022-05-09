@@ -60,6 +60,20 @@
     flex: 1 0 0;
     padding: 10px 20px;
  }
+
+ .ms-special_features {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    -webkit-flex-wrap: nowrap;
+    flex-wrap: nowrap;
+    -webkit-align-items: start;
+    align-items: start;
+    -webkit-flex: 1 0 0;
+    flex: 1 0 0;
+    padding: 10px 20px;
+ }
  
  .ms-welcome__main > h2 {
      width: 100%;

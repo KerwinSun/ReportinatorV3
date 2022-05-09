@@ -10,9 +10,9 @@ Office.onReady((info) => {
     document.getElementById("app-body").style.display = "flex";
     //document.getElementById("run").onclick = run;
     document.getElementById("search").oninput = search;
+    document.getElementById("template").onclick = createTemplate;
   }
 });
-
 const Findings = require("../helpers/findingsHandler").default;
 
 const searchOptions = {
@@ -33,46 +33,32 @@ const documentSearch = new Document(searchOptions);
 const Writer = require("../helpers/docWriter").default;
 const writer = new Writer();
 
+const TemplateHandler = require("../helpers/TemplateHandler").default;
+const templateHandler = new TemplateHandler();
+
 let id = 0;
 let categories = {};
+load()
 
-fetch("../../assets").then((response) => {
-  console.log(response);
-});
+function load() {
+  id = 0;
+  categories = {};
+  const findings = new Findings();
+  findings.getAllFileData().then((findings) => {
+    console.log(findings);
+    findings.forEach((finding) => {
+      finding["id"] = id++;
+      if (categories[finding.category] === undefined) {
+        categories[finding.category] = 1;
+      } else {
+        categories[finding.category] += 1;
+      }
 
-const findings = new Findings();
-findings.getAllFileData().then((findings) => {
-  findings.forEach((finding) => {
-    finding["id"] = id++;
-    if (categories[finding.category] === undefined) {
-      categories[finding.category] = 1;
-    } else {
-      categories[finding.category] += 1;
-    }
-
-    documentSearch.add(finding);
+      documentSearch.add(finding);
+    });
+    loadCategories();
   });
-  loadCategories();
-});
-
-// load the findings
-// fetch("../../assets/findings.json")
-//   .then((response) => {
-//     return response.json();
-//   })
-//   .then((findings) => {
-//     findings.forEach((finding) => {
-//       finding["id"] = id++;
-//       if (categories[finding.category] === undefined) {
-//         categories[finding.category] = 1;
-//       } else {
-//         categories[finding.category] += 1;
-//       }
-
-//       documentSearch.add(finding);
-//     });
-//     loadCategories();
-//   });
+}
 
 function loadCategories() {
   document.getElementById("resultlist").innerHTML = "";
@@ -110,7 +96,9 @@ function addCategoryItem(id, name, tagline) {
 async function createDropDown() {
   await Word.run(async (context) => {
     const categoryList = Object.entries(documentSearch?.store).filter((entry) => entry[1].category === this.id);
-    document.getElementById("resultlist").innerHTML = `<div id="back" class="ms-ListItem-secondaryText"> <span style="float: right;"><i class="ms-Icon ms-Icon--CaretSolidRight" style="transform: rotate(180deg);" transform:=""></i> back </span></div>`;
+    document.getElementById(
+      "resultlist"
+    ).innerHTML = `<div id="back" class="ms-ListItem-secondaryText"> <span style="float: right;"><i class="ms-Icon ms-Icon--CaretSolidRight" style="transform: rotate(180deg);" transform:=""></i> back </span></div>`;
 
     for (let item of categoryList) {
       addListItem(item[1].id, item[1].title, item[1].title);
@@ -121,7 +109,6 @@ async function createDropDown() {
     });
 
     document.getElementById("back").onclick = loadCategories;
-
   }).catch(function (error) {
     console.log("Error: " + error);
     if (error instanceof OfficeExtension.Error) {
@@ -193,16 +180,13 @@ async function insertIssue() {
     //use helper module to write issue
 
     writer.writeIssue(context, Word, issueJSON);
-  }).catch(function (error) {
-    console.log("Error: " + error);
-    if (error instanceof OfficeExtension.Error) {
-      console.log("Debug info: " + JSON.stringify(error.debugInfo));
-    }
+    await context.sync();
   });
 }
 
 export async function search() {
   return Word.run(async (context) => {
+    document.getElementById("resultlist").innerHTML = "";
     let searchVal = document.getElementById("search").value;
     if (searchVal == "") {
       loadCategories();
@@ -231,6 +215,14 @@ export async function search() {
       //event to handle the arrow thing
       button.onclick = insertIssue;
     });
+    await context.sync();
+  });
+}
+
+export async function createTemplate() {
+  await Word.run(async (context) => {
+    await templateHandler.templateIssue(context);
+    load();
     await context.sync();
   });
 }
