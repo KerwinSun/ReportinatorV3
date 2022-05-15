@@ -17,6 +17,16 @@ class Findings {
     return response;
   }
 
+  async getLateastCommit() {
+    try {
+      const latestCommit = await (await this.makeApiRequest("projects/7/repository/commits")).json();
+      const latestHash = latestCommit[1].id;
+      return latestHash;
+    } catch (e) {
+      return "offline";
+    }
+  }
+
   //function to get every issue
   async getAllRepositoryFiles() {
     let currentPage = 1;
@@ -46,9 +56,10 @@ class Findings {
     ).json();
   }
 
-  async getAllFileData() {
-    let data = []
-    if (localStorage.getItem("fileData")) {
+  async getAllFileData(document) {
+    const latestCommit = await this.getLateastCommit();
+    let data = [];
+    if (latestCommit === "offline" || latestCommit === localStorage.getItem("commitHash")) {
       console.log("loading from local");
       data.push(...JSON.parse(localStorage.getItem("fileData")));
     } else {
@@ -57,7 +68,7 @@ class Findings {
       for (const fileObject of fileArray) {
         let fileDataObject = fileObject.type == "blob" && (await this.getFile(fileObject.path));
         issueCount++;
-        console.log(issueCount);
+        document.getElementById("resultlist").innerHTML = "Loading" + ".".repeat(issueCount % 4);
         let fileContentsDecoded = fileDataObject.content && atob(fileDataObject.content);
         fileDataObject &&
           this.fileData.push({
@@ -68,12 +79,13 @@ class Findings {
       }
 
       localStorage.setItem("fileData", JSON.stringify(this.fileData));
+      localStorage.setItem("commitHash", latestCommit);
       data.push(...this.fileData);
     }
     if (localStorage.getItem("customFileData")) {
       console.log(JSON.parse(localStorage.getItem("customFileData")));
       data.push(...JSON.parse(localStorage.getItem("customFileData")));
-    } 
+    }
     return data;
   }
 }

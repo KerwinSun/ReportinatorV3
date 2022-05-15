@@ -44,7 +44,7 @@ function load() {
   id = 0;
   categories = {};
   const findings = new Findings();
-  findings.getAllFileData().then((findings) => {
+  findings.getAllFileData(document).then((findings) => {
     console.log(findings);
     findings.forEach((finding) => {
       finding["id"] = id++;
@@ -53,7 +53,6 @@ function load() {
       } else {
         categories[finding.category] += 1;
       }
-
       documentSearch.add(finding);
     });
     loadCategories();
