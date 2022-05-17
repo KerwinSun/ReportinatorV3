@@ -19,8 +19,8 @@
     "lint:fix": "office-addin-lint fix",
     "prettier": "office-addin-lint prettier",
     "start": "webpack serve --mode development --open",
-    "start:desktop": "office-addin-debugging start manifest.xml desktop",
-    "start:https": "webpack serve --mode development --open --env WEBPACK_HTTPS=true",
+    "start:sideload": "office-addin-debugging start manifest.xml",
+    "start:noSSL": "webpack serve --mode development --open --env WEBPACK_HTTPS=false",
     "stop": "office-addin-debugging stop manifest.xml",
     "validate": "office-addin-manifest validate manifest.xml",
     "watch": "webpack --mode development --watch"

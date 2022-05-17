@@ -6,13 +6,13 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const urlDev = "https://localhost:3000/";
 const urlProd = "https://starfish-app-gymru.ondigitalocean.app/"; // CHANGE THIS TO YOUR PRODUCTION DEPLOYMENT LOCATION
-
 async function getHttpsOptions() {
   const httpsOptions = await devCerts.getHttpsServerOptions();
   return { cacert: httpsOptions.ca, key: httpsOptions.key, cert: httpsOptions.cert };
 }
 
 module.exports = async (env, options) => {
+  console.log(JSON.stringify(env))
   const dev = options.mode === "development";
   const buildType = dev ? "dev" : "prod";
   const config = {
@@ -91,7 +91,7 @@ module.exports = async (env, options) => {
         "Access-Control-Allow-Origin": "*",
       },
       allowedHosts: "all",
-      https: env.WEBPACK_HTTPS === undefined ? options.https : await getHttpsOptions(),
+      https: env.WEBPACK_HTTPS === 'false' ? options.https : await getHttpsOptions(),
       port: process.env.npm_package_config_dev_server_port || 3000,
     },
   };
