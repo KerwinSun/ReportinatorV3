@@ -65,20 +65,6 @@ class Writer {
     return issuesMap;
   }
 
-  async applySpecialFonts(context, document) {
-    const charRanges = paragraph.search("\\*\\*\\*(*{1,})\\*\\*\\*", { matchWildcards: true });
-    charRanges.load();
-    await context.sync();
-    try {
-      for (const range of charRanges.items) {
-        await range.context.sync();
-        await range.select();
-      }
-    } catch (e) {
-      console.log(e);
-    }
-    return charRanges;
-  }
 }
 
 export default Writer;
