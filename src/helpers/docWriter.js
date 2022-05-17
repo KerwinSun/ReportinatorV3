@@ -7,9 +7,22 @@ class Writer {
     const selection = context.document.getSelection();
 
     for (let issue of IssuesMap) {
-      const paragraph = selection.insertParagraph(issue.text, Word.InsertLocation.before);
+      const paragraph = await selection.insertParagraph(issue.text, Word.InsertLocation.before);
       paragraph[issue.style.type] = issue.style.name;
     }
+
+    var searchResults = await context.document.body.search("\\*\\*\\*(*{1,})\\*\\*\\*", { matchWildcards: true });
+    await searchResults.load();
+    await context.sync();
+
+    for (let result of searchResults.items) {
+      result.insertHtml(result.text.replaceAll("***",""), "Replace")
+      console.log(result)
+      //result.font.bold = true;
+      result.font.color = 'Red';
+    }
+
+    context.document.load();
     await context.sync();
   }
 
@@ -28,11 +41,10 @@ class Writer {
     let coding = false;
     issueArray.map((element, index) => {
       element = element.trimStart().replace("â\x80\x93", "-");
-      if ((coding)) {
-
-        if(element.substring(0, 3) === "```"){
+      if (coding) {
+        if (element.substring(0, 3) === "```") {
           coding = false;
-        }else{
+        } else {
           issuesMap.push({ text: element, style: { type: "style", name: "Code" } });
         }
       } else {
@@ -51,6 +63,21 @@ class Writer {
       }
     });
     return issuesMap;
+  }
+
+  async applySpecialFonts(context, document) {
+    const charRanges = paragraph.search("\\*\\*\\*(*{1,})\\*\\*\\*", { matchWildcards: true });
+    charRanges.load();
+    await context.sync();
+    try {
+      for (const range of charRanges.items) {
+        await range.context.sync();
+        await range.select();
+      }
+    } catch (e) {
+      console.log(e);
+    }
+    return charRanges;
   }
 }
 

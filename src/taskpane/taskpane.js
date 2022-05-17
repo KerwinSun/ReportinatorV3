@@ -178,7 +178,7 @@ async function insertIssue() {
 
     //use helper module to write issue
 
-    writer.writeIssue(context, Word, issueJSON);
+    await writer.writeIssue(context, Word, issueJSON);
     await context.sync();
   });
 }
